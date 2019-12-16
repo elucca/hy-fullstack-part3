@@ -15,44 +15,6 @@ morgan.token('data', function (req, res) {
     return JSON.stringify(req.body)
 })
 
-let persons = [
-    {
-        "name": "Arto Hellas",
-        "number": "040-123456",
-        "id": 1
-    },
-    {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": 2
-    },
-    {
-        "name": "Dan Abramov",
-        "number": "12-43-234345",
-        "id": 3
-    },
-    {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122",
-        "id": 4
-    },
-    {
-        "name": "Edsger Dijkstra",
-        "number": "01234",
-        "id": 5
-    },
-    {
-        "name": "pööp-ameeba",
-        "number": "040 238 212",
-        "id": 6
-    },
-    {
-        "name": "delete this",
-        "number": "00123",
-        "id": 7
-    }
-]
-
 app.get('/api/persons', (req, res) => {
     Person.find({}).then(persons => {
         res.json(persons.map(person => person.toJSON()))
@@ -92,22 +54,24 @@ app.post('/api/persons', (req, res) => {
         })
     }
 
+    // Not refactored to use MongoDB yet
+    /*
     const potentialDuplicate = persons.find(p => p.name === body.name)
     if (potentialDuplicate) {
         return res.status(400).json({
             error: 'Name must be unique.'
         })
     }
+    */
 
-    const person = {
+    const person = new Person({
         name: body.name,
-        number: body.number,
-        id: Math.floor(Math.random() * 1000000) // real bad
-    }
+        number: body.number
+    })
 
-    persons = persons.concat(person)
-
-    res.json(person)
+    person.save().then(savedPerson => {
+        res.json(savedPerson.toJSON)
+    })
 })
 
 app.get('/info', (req, res) => {
