@@ -70,7 +70,7 @@ app.post('/api/persons', (req, res) => {
     })
 
     person.save().then(savedPerson => {
-        res.json(savedPerson.toJSON)
+        res.json(savedPerson.toJSON())
     })
 })
 
