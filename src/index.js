@@ -74,6 +74,21 @@ app.post('/api/persons', (req, res) => {
     })
 })
 
+app.put('/api/persons/:id', (req, res, next) => {
+    const body = req.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(updatedPerson => {
+            res.json(updatedPerson.toJSON())
+        })
+        .catch(error => next(error))
+})
+
 app.get('/info', (req, res) => {
     res.send(`Phonebook has info for ${persons.length} people. <br> ${new Date()}`)
 })
@@ -88,7 +103,7 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
 
     if (error.name === 'CastError') {
-        return response.status(400).send({ error: 'Malformatted id' })
+        return response.status(400).send({ error: 'MFalformatted id' })
     }
 
     next(error)
