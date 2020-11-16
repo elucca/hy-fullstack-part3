@@ -6,11 +6,13 @@
   "scripts": {
     "start": "node src/index.js",
     "watch": "nodemon src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
   "author": "Juho Kesälä",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^7.13.0",
     "nodemon": "^2.0.6"
   },
   "dependencies": {
