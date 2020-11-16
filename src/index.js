@@ -33,13 +33,13 @@ app.get('/api/persons/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndRemove(req.params.id)
         .then(res.status(204).end())
         .catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
 
     if (!body.name) {
@@ -54,24 +54,16 @@ app.post('/api/persons', (req, res) => {
         })
     }
 
-    // Not refactored to use MongoDB yet
-    /*
-    const potentialDuplicate = persons.find(p => p.name === body.name)
-    if (potentialDuplicate) {
-        return res.status(400).json({
-            error: 'Name must be unique.'
-        })
-    }
-    */
-
     const person = new Person({
         name: body.name,
         number: body.number
     })
 
-    person.save().then(savedPerson => {
-        res.json(savedPerson.toJSON())
-    })
+    person.save()
+        .then(savedPerson => {
+            res.json(savedPerson.toJSON())
+        })
+        .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
@@ -95,17 +87,19 @@ app.get('/info', (req, res) => {
     })
 })
 
-const unknownEndpoint = (request, response) => {
+const unknownEndpoint = (req, res) => {
     response.status(404).send({ error: 'Unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
 
-const errorHandler = (error, request, response, next) => {
+const errorHandler = (error, req, res, next) => {
     console.error(error.message)
 
     if (error.name === 'CastError') {
-        return response.status(400).send({ error: 'MFalformatted id' })
+        return res.status(400).send({ error: 'Malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message })
     }
 
     next(error)
